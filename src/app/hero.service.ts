@@ -16,6 +16,10 @@ export class HeroService {
     private http: HttpClient
   ) { }
 
+  httpOptions = {
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+  }
+
   private log(message: string) {
     this.messageService.add(`HeroService: ${message}`)
   }
@@ -50,12 +54,18 @@ export class HeroService {
   /** GET hero by id. Will 404 if id not found */
   getHero(id: number): Observable<Hero> {
     const url = `${this.heroesUrl}/${id}`;
-    // const hero = HEROES.find(h => h.id === id)!;
-    // this.messageService.add(`HeroService: fetched hero id=${id}`);
     return this.http.get<Hero>(url).pipe(
       tap(_ => this.log(`fetched hero id=${id}`)),
       catchError(this.handleError<Hero>(`getHero id=${id}`))
     ); 
+  }
+
+  /** PUT: Update the hero on the server */
+  updateHero(hero: Hero): Observable<any> {
+    return this.http.put(this.heroesUrl, hero, this.httpOptions).pipe(
+      tap(_ => this.log(`updated hero id=${hero.id}`)),
+      catchError(this.handleError<any>('updateHero'))
+    )
   }
   
 }
